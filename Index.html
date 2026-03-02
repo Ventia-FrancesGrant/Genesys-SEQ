@@ -85,48 +85,114 @@
             flex-shrink: 0;
         }
 
-        /* Priority Matrix */
-        .priority-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        /* --- SECTION 2: PROTOCOLS --- */
+        .protocol-container {
+            display: flex;
+            flex-wrap: wrap;
             gap: 15px;
             margin-bottom: 20px;
         }
+        .protocol-box {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .protocol-missing {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+        .protocol-standard {
+            background-color: #d1e7dd;
+            border-left: 5px solid #198754;
+        }
+        .protocol-title {
+            display: block;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: 5px;
+        }
+        .step-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .step-list li { margin-bottom: 5px; }
 
+        /* --- SECTION 3: PRIORITY SELECTOR --- */
+        .matrix-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
         .priority-card {
-            border: 1px solid var(--border);
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid #ddd;
             border-radius: 6px;
             padding: 15px;
-            position: relative;
-            overflow: hidden;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
         }
-
-        .priority-card.p1 { border-left: 5px solid var(--urgent); }
-        .priority-card.p2 { border-left: 5px solid var(--priority); }
-        .priority-card.p3 { border-left: 5px solid var(--normal); }
-        .priority-card.p4 { border-left: 5px solid #95a5a6; }
-
-        .p-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.8rem;
-            margin-bottom: 10px;
+        .priority-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .priority-card.active {
+            border: 2px solid #333;
+            background-color: #f0f0f0;
         }
         
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
         .bg-urgent { background-color: var(--urgent); }
         .bg-priority { background-color: var(--priority); }
         .bg-normal { background-color: var(--normal); }
-        .bg-low { background-color: #95a5a6; }
 
-        .sla-info {
+        /* SLA Result Box */
+        #sla-result {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 6px;
+            display: none; /* Hidden until clicked */
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .sla-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .sla-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .sla-item small {
+            display: block;
+            opacity: 0.8;
+            margin-bottom: 5px;
             font-size: 0.85rem;
-            color: #666;
-            margin-top: 8px;
-            padding-top: 8px;
-            border-top: 1px dashed #ddd;
+        }
+        .sla-item strong {
+            font-size: 1.2rem;
+            display: block;
         }
 
         /* Workflow Tables */
@@ -155,7 +221,7 @@
             background-color: #f8f9fa;
         }
         .workflow-check-row.checked {
-            background-color: #d4edda; /* Green when checked */
+            background-color: #d4edda;
         }
         .workflow-check-row input[type="checkbox"] {
             transform: scale(1.3);
@@ -285,7 +351,8 @@
         <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>The Risk</strong> (Danger/Teaching Stopped)</label>
         <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>Contact Name &amp; Number</strong></label>
     </div>
-<!-- SECTION 2: PROTOCOLS -->
+
+    <!-- SECTION 2: PROTOCOLS -->
     <h2>2. Select Protocol</h2>
     <div class="protocol-container">
         <!-- Missing Info -->
@@ -312,25 +379,25 @@
     </div>
 
     <!-- SECTION 3: PRIORITY SELECTOR -->
-    <h2>3. Determine Priority & SLAs</h2>
+    <h2>3. Determine Priority &amp; SLAs</h2>
     
     <div class="matrix-container">
         <div class="priority-card p-urgent" onclick="selectPriority('urgent')">
             <span class="badge bg-urgent">URGENT</span>
-            <p><strong>Health & Safety Risk</strong></p>
-            <p style="font-size:0.85rem;">Immediate danger? Active flooding? Exposed wires?</p>
+            <p style="margin: 5px 0;"><strong>Health &amp; Safety Risk</strong></p>
+            <p style="font-size:0.85rem; margin:0; color:#666;">Dangerous to health/safety or major damage risk.</p>
         </div>
 
         <div class="priority-card p-priority" onclick="selectPriority('priority')">
             <span class="badge bg-priority">PRIORITY</span>
-            <p><strong>Disruption to Teaching</strong></p>
-            <p style="font-size:0.85rem;">Class cancelled? Main entrance blocked? Core services down?</p>
+            <p style="margin: 5px 0;"><strong>Disruption to Teaching</strong></p>
+            <p style="font-size:0.85rem; margin:0; color:#666;">Major disruption or interruption to Core Services.</p>
         </div>
 
         <div class="priority-card p-normal" onclick="selectPriority('normal')">
             <span class="badge bg-normal">NORMAL</span>
-            <p><strong>Inconvenience</strong></p>
-            <p style="font-size:0.85rem;">Cosmetic damage? Scuff marks? Dripping tap?</p>
+            <p style="margin: 5px 0;"><strong>Inconvenience</strong></p>
+            <p style="font-size:0.85rem; margin:0; color:#666;">Inconvenient or potential long-term damage.</p>
         </div>
     </div>
 
@@ -344,18 +411,18 @@
                 <strong id="time-temp">--</strong>
             </div>
             <div class="sla-item">
-                <small>Perm. Fix (Cleaning)</small>
+                <small>Perm. Fix (Unplanned Cleaning)</small>
                 <strong id="time-clean">--</strong>
             </div>
             <div class="sla-item" style="grid-column: span 2;">
-                <small>Perm. Fix (Maintenance)</small>
+                <small>Perm. Fix (All Other Services)</small>
                 <strong id="time-maint">--</strong>
             </div>
         </div>
     </div>
 
     <!-- 4. WORKFLOW CHECKLISTS -->
-    <h2>3. Workflow Checklists</h2>
+    <h2>4. Workflow Checklists</h2>
     <div id="validation-warning">⚠️ <strong>STOP:</strong> You must complete the checklist items below before generating the description.</div>
 
     <h3>A. Raise Event Checklist</h3>
@@ -396,7 +463,7 @@
             <tr class="workflow-check-row">
                 <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
                 <td><strong>Work Type</strong></td>
-                <td>Set Priority (P1-P4) based on matrix above</td>
+                <td>Set Priority (Urgent/Priority/Normal)</td>
             </tr>
             <tr class="workflow-check-row">
                 <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
@@ -468,8 +535,8 @@
         </tbody></table>
     </div>
 
-    <!-- 4. GENERATOR -->
-    <h2>4. QFM Data Entry Generator</h2>
+    <!-- 5. GENERATOR -->
+    <h2>5. QFM Data Entry Generator</h2>
     <div class="generator-box">
         <p style="margin-top:0; color:#666; font-size:0.9rem;">Fill in the details below. You must complete the <strong>Raise Event Checklist</strong> above before generating.</p>
         
@@ -509,6 +576,51 @@
 </div>
 
 <script>
+    // --- Priority Selection Logic ---
+    // Updated based on the provided image
+    const slaData = {
+        urgent: { 
+            name: "URGENT", 
+            temp: "30 Minutes", 
+            clean: "1 Hour", 
+            maint: "4 Hours",
+            color: "#e74c3c"
+        },
+        priority: { 
+            name: "PRIORITY", 
+            temp: "1 Hour", 
+            clean: "2 Hours", 
+            maint: "3 School Days",
+            color: "#f39c12"
+        },
+        normal: { 
+            name: "NORMAL", 
+            temp: "2 Hours", 
+            clean: "5 School Days", 
+            maint: "10 School Days",
+            color: "#27ae60"
+        }
+    };
+
+    function selectPriority(level) {
+        // 1. Highlight the card
+        document.querySelectorAll('.priority-card').forEach(card => card.classList.remove('active'));
+        document.querySelector(`.p-${level}`).classList.add('active');
+
+        // 2. Update SLA Data
+        const data = slaData[level];
+        document.getElementById('selected-priority-name').innerText = data.name;
+        document.getElementById('time-temp').innerText = data.temp;
+        document.getElementById('time-clean').innerText = data.clean;
+        document.getElementById('time-maint').innerText = data.maint;
+
+        // 3. Show Result Box with correct color
+        const resultBox = document.getElementById('sla-result');
+        resultBox.style.display = 'block';
+        resultBox.style.backgroundColor = data.color;
+    }
+
+    // --- Workflow Logic ---
     function toggleRow(checkbox) {
         const row = checkbox.closest('tr');
         if (checkbox.checked) {
@@ -534,7 +646,6 @@
 
     function generateAndCopy() {
         // 1. Validation: Check if Raise Event checklist is done
-        // We specifically check the #raise-event-table inputs
         const raiseEventChecks = document.querySelectorAll('#raise-event-table .wf-chk');
         let allChecked = true;
         
@@ -542,7 +653,6 @@
             if(!chk.checked) allChecked = false;
         });
 
-        // If not all checked, show warning and scroll to it
         if (!allChecked) {
             const warning = document.getElementById('validation-warning');
             warning.style.display = 'block';
@@ -556,7 +666,6 @@
         const risk = document.getElementById('gen-risk').value;
         const loc = document.getElementById('gen-location').value;
 
-        // Basic validation for empty fields
         if(!sit || !risk || !loc) {
             alert("Please fill in all fields (Situation, Risk, Location).");
             return;
@@ -583,6 +692,10 @@
         
         // Reset Type
         document.getElementById('gen-type').selectedIndex = 0;
+
+        // Reset Priority
+        document.getElementById('sla-result').style.display = 'none';
+        document.querySelectorAll('.priority-card').forEach(card => card.classList.remove('active'));
     }
 </script>
 
