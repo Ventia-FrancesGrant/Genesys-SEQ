@@ -1,0 +1,567 @@
+<!DOCTYPE html><html lang="en"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QFM Workflow &amp; Priority Guide</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --urgent: #e74c3c;
+            --priority: #f39c12;
+            --normal: #27ae60;
+            --light: #f8f9fa;
+            --border: #dee2e6;
+            --warning-bg: #fff3cd;
+            --warning-text: #856404;
+            --error-bg: #f8d7da;
+            --error-text: #721c24;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f6f8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-top: 30px;
+            font-size: 1.3rem;
+            background-color: #f1f5f9;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 5px solid var(--secondary);
+        }
+
+        h3 {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            margin-top: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        /* Triage Section */
+        .checklist-box {
+            background-color: #eef2f7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 4px;
+            transform: scale(1.2);
+            flex-shrink: 0;
+        }
+
+        /* Priority Matrix */
+        .priority-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .priority-card {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .priority-card.p1 { border-left: 5px solid var(--urgent); }
+        .priority-card.p2 { border-left: 5px solid var(--priority); }
+        .priority-card.p3 { border-left: 5px solid var(--normal); }
+        .priority-card.p4 { border-left: 5px solid #95a5a6; }
+
+        .p-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .bg-urgent { background-color: var(--urgent); }
+        .bg-priority { background-color: var(--priority); }
+        .bg-normal { background-color: var(--normal); }
+        .bg-low { background-color: #95a5a6; }
+
+        .sla-info {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ddd;
+        }
+
+        /* Workflow Tables */
+        .workflow-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .workflow-table th, .workflow-table td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            vertical-align: middle;
+        }
+        .workflow-table th {
+            background-color: var(--light);
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .workflow-check-row {
+            background-color: #fff;
+            transition: background-color 0.2s;
+        }
+        .workflow-check-row:hover {
+            background-color: #f8f9fa;
+        }
+        .workflow-check-row.checked {
+            background-color: #d4edda; /* Green when checked */
+        }
+        .workflow-check-row input[type="checkbox"] {
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        /* Generator Form */
+        .generator-box {
+            background-color: #fff;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .result-area {
+            background-color: #f1f5f9;
+            border: 1px dashed #666;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        .copy-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .copy-btn:hover { background-color: #2980b9; }
+
+        /* Validation Warning */
+        #validation-warning {
+            display: none;
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .reset-btn:hover { background: #eee; }
+
+        /* Tabs */
+        .tab-container { display: flex; margin-bottom: 0; }
+        .tab-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-btn.active {
+            background: white;
+            font-weight: bold;
+            border-bottom: 2px solid white;
+            margin-bottom: -1px;
+            z-index: 1;
+        }
+        .tab-content { 
+            display: none; 
+            border: 1px solid var(--border);
+            padding: 15px;
+            background: white;
+            border-radius: 0 4px 4px 4px;
+        }
+        .tab-content.active { display: block; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>QFM Workflow Guide <button class="reset-btn" onclick="resetAll()">Reset Form</button></h1>
+
+    <!-- 1. TRIAGE -->
+    <h2>1. Triage Checklist</h2>
+    <div class="checklist-box">
+        <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>School Name</strong> (Matches Site List)</label>
+        <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>Specific Location</strong> (Room/Floor)</label>
+        <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>The Issue</strong> (Broken/Dirty/Leaking)</label>
+        <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>The Risk</strong> (Danger/Teaching Stopped)</label>
+        <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>Contact Name &amp; Number</strong></label>
+    </div>
+
+    <!-- 2. PRIORITY & SLA -->
+    <h2>2. Determine Priority &amp; SLA</h2>
+    <div class="priority-grid">
+        <!-- P1 -->
+        <div class="priority-card p1">
+            <span class="p-badge bg-urgent">P1 - Emergency</span>
+            <p style="margin:0; font-size:0.9rem;"><strong>Immediate Threat:</strong> Life safety, security breach, major flood/power loss.</p>
+            <div class="sla-info">
+                <strong>Response:</strong> 1 Hour<br>
+                <strong>Rectification:</strong> 4 Hours
+            </div>
+        </div>
+        
+        <!-- P2 -->
+        <div class="priority-card p2">
+            <span class="p-badge bg-priority">P2 - Urgent</span>
+            <p style="margin:0; font-size:0.9rem;"><strong>Disruption:</strong> Heating failure, minor leak, teaching affected but possible.</p>
+            <div class="sla-info">
+                <strong>Response:</strong> 4 Hours<br>
+                <strong>Rectification:</strong> 24 Hours
+            </div>
+        </div>
+
+        <!-- P3 -->
+        <div class="priority-card p3">
+            <span class="p-badge bg-normal">P3 - Routine</span>
+            <p style="margin:0; font-size:0.9rem;"><strong>Standard:</strong> General repairs, lighting (non-critical), carpentry.</p>
+            <div class="sla-info">
+                <strong>Response:</strong> 24 Hours<br>
+                <strong>Rectification:</strong> 5 Days
+            </div>
+        </div>
+
+        <!-- P4 -->
+        <div class="priority-card p4">
+            <span class="p-badge bg-low">P4 - Scheduled</span>
+            <p style="margin:0; font-size:0.9rem;"><strong>Low Priority:</strong> Cosmetic issues, planned maintenance requests.</p>
+            <div class="sla-info">
+                <strong>Response:</strong> 5 Days<br>
+                <strong>Rectification:</strong> 20 Days
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. WORKFLOW CHECKLISTS -->
+    <h2>3. Workflow Checklists</h2>
+    <div id="validation-warning">⚠️ <strong>STOP:</strong> You must complete the checklist items below before generating the description.</div>
+
+    <h3>A. Raise Event Checklist</h3>
+    <table class="workflow-table" id="raise-event-table">
+        <thead>
+            <tr>
+                <th width="50">Done</th>
+                <th width="150">Field</th>
+                <th>Instruction</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Event Type</strong></td>
+                <td>Service Event (unless specified)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Reported By</strong></td>
+                <td>Name of reporter (or BM – [School Name])</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Site/Location</strong></td>
+                <td>Based on provided info</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Service Group</strong></td>
+                <td>Cleaning Unplanned OR Maintenance Unplanned</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Service</strong></td>
+                <td>Select relevant Trade</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Work Type</strong></td>
+                <td>Set Priority (P1-P4) based on matrix above</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Assigned To</strong></td>
+                <td><strong>Always FM</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B. Temp Fix Checklist</h3>
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="openTab('tab1', event)">Reported by School/Internal</button>
+        <button class="tab-btn" onclick="openTab('tab2', event)">Reported by FM/Officer</button>
+    </div>
+
+    <!-- Tab 1 -->
+    <div id="tab1" class="tab-content active">
+        <table class="workflow-table">
+            <tbody><tr class="workflow-check-row">
+                <td width="50" align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Call Schools Officer / FM</strong></td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Reported Date &amp; Time</strong> (Email/Call timestamp)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Notified</strong> (Time we notified SO/FM)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Temp Fix Actual</strong> (Time attended/confirmed)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Update Contractor</strong> (SO/FM/Subcontractor)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Update Notes</strong> (Action taken) <strong>*USE TIMESTAMP</strong></td>
+            </tr>
+        </tbody></table>
+    </div>
+
+    <!-- Tab 2 -->
+    <div id="tab2" class="tab-content">
+        <table class="workflow-table">
+            <tbody><tr class="workflow-check-row">
+                <td width="50" align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Reported Date &amp; Time</strong> (Email/Call timestamp)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Notified</strong> (Email/Call timestamp)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Temp Fix Actual</strong> (Email/Call timestamp)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Update Contractor</strong> (SO/FM/Subcontractor)</td>
+            </tr>
+            <tr class="workflow-check-row">
+                <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
+                <td><strong>Update Notes</strong> (Action taken) <strong>*USE TIMESTAMP</strong></td>
+            </tr>
+        </tbody></table>
+    </div>
+
+    <!-- 4. GENERATOR -->
+    <h2>4. QFM Data Entry Generator</h2>
+    <div class="generator-box">
+        <p style="margin-top:0; color:#666; font-size:0.9rem;">Fill in the details below. You must complete the <strong>Raise Event Checklist</strong> above before generating.</p>
+        
+        <div class="form-group">
+            <label>Type</label>
+            <select id="gen-type" class="form-control">
+                <option value="Repair">Repair</option>
+                <option value="Replace">Replace</option>
+                <option value="Install">Install</option>
+                <option value="Clean">Clean</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Situation (What is wrong?)</label>
+            <textarea id="gen-situation" class="form-control" placeholder="e.g. The handle on the door has snapped off..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Risk or Impact</label>
+            <textarea id="gen-risk" class="form-control" placeholder="e.g. Door cannot be opened, trapping hazard..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="gen-location" class="form-control" placeholder="e.g. Block A, Room 101">
+        </div>
+
+        <button class="copy-btn" onclick="generateAndCopy()">Generate Description</button>
+
+        <div class="result-area">
+            <label style="font-size:0.8rem; color:#666; display:block; margin-bottom:5px;">Output (Copy this into QFM):</label>
+            <div id="final-output" style="font-family:monospace; white-space: pre-wrap; font-weight:bold; color:#000; min-height: 20px;"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleRow(checkbox) {
+        const row = checkbox.closest('tr');
+        if (checkbox.checked) {
+            row.classList.add('checked');
+            // Hide warning if they start checking boxes
+            document.getElementById('validation-warning').style.display = 'none';
+        } else {
+            row.classList.remove('checked');
+        }
+    }
+
+    function openTab(tabId, event) {
+        // Hide all contents
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        // Deactivate all buttons
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        // Show selected
+        document.getElementById(tabId).classList.add('active');
+        // Activate button
+        event.target.classList.add('active');
+    }
+
+    function generateAndCopy() {
+        // 1. Validation: Check if Raise Event checklist is done
+        // We specifically check the #raise-event-table inputs
+        const raiseEventChecks = document.querySelectorAll('#raise-event-table .wf-chk');
+        let allChecked = true;
+        
+        raiseEventChecks.forEach(chk => {
+            if(!chk.checked) allChecked = false;
+        });
+
+        // If not all checked, show warning and scroll to it
+        if (!allChecked) {
+            const warning = document.getElementById('validation-warning');
+            warning.style.display = 'block';
+            warning.scrollIntoView({behavior: "smooth", block: "center"});
+            return; 
+        }
+
+        // 2. Generate Text
+        const type = document.getElementById('gen-type').value;
+        const sit = document.getElementById('gen-situation').value;
+        const risk = document.getElementById('gen-risk').value;
+        const loc = document.getElementById('gen-location').value;
+
+        // Basic validation for empty fields
+        if(!sit || !risk || !loc) {
+            alert("Please fill in all fields (Situation, Risk, Location).");
+            return;
+        }
+
+        const finalString = `${type} ${sit}\n${risk}\n${loc}`;
+        
+        document.getElementById('final-output').innerText = finalString;
+    }
+
+    function resetAll() {
+        // Uncheck all boxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+            chk.checked = false;
+            if(chk.closest('tr')) chk.closest('tr').classList.remove('checked');
+        });
+
+        // Clear inputs
+        document.getElementById('gen-situation').value = '';
+        document.getElementById('gen-risk').value = '';
+        document.getElementById('gen-location').value = '';
+        document.getElementById('final-output').innerText = '';
+        document.getElementById('validation-warning').style.display = 'none';
+        
+        // Reset Type
+        document.getElementById('gen-type').selectedIndex = 0;
+    }
+</script>
+
+
+
+</body></html>
