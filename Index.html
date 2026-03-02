@@ -285,52 +285,76 @@
         <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>The Risk</strong> (Danger/Teaching Stopped)</label>
         <label class="checklist-item"><input type="checkbox" class="triage-chk"> <strong>Contact Name &amp; Number</strong></label>
     </div>
-
-    <!-- 2. PRIORITY & SLA -->
-    <h2>2. Determine Priority &amp; SLA</h2>
-    <div class="priority-grid">
-        <!-- P1 -->
-        <div class="priority-card p1">
-            <span class="p-badge bg-urgent">P1 - Emergency</span>
-            <p style="margin:0; font-size:0.9rem;"><strong>Immediate Threat:</strong> Life safety, security breach, major flood/power loss.</p>
-            <div class="sla-info">
-                <strong>Response:</strong> 1 Hour<br>
-                <strong>Rectification:</strong> 4 Hours
-            </div>
-        </div>
-        
-        <!-- P2 -->
-        <div class="priority-card p2">
-            <span class="p-badge bg-priority">P2 - Urgent</span>
-            <p style="margin:0; font-size:0.9rem;"><strong>Disruption:</strong> Heating failure, minor leak, teaching affected but possible.</p>
-            <div class="sla-info">
-                <strong>Response:</strong> 4 Hours<br>
-                <strong>Rectification:</strong> 24 Hours
-            </div>
+<!-- SECTION 2: PROTOCOLS -->
+    <h2>2. Select Protocol</h2>
+    <div class="protocol-container">
+        <!-- Missing Info -->
+        <div class="protocol-box protocol-missing">
+            <span class="protocol-title">⚠️ Missing Information Protocol</span>
+            <p style="margin-top:0; font-size:0.9rem;"><em>Use if any checklist item above is missing.</em></p>
+            <ol class="step-list">
+                <li><strong>CALL</strong> the requestor immediately for details.</li>
+                <li>If no answer: <strong>REPLY via email</strong> noting what is missing.</li>
+                <li><strong>CREATE</strong> the event in QFM.</li>
+                <li><strong>ASSIGN</strong> to the FM.</li>
+            </ol>
         </div>
 
-        <!-- P3 -->
-        <div class="priority-card p3">
-            <span class="p-badge bg-normal">P3 - Routine</span>
-            <p style="margin:0; font-size:0.9rem;"><strong>Standard:</strong> General repairs, lighting (non-critical), carpentry.</p>
-            <div class="sla-info">
-                <strong>Response:</strong> 24 Hours<br>
-                <strong>Rectification:</strong> 5 Days
-            </div>
+        <!-- Standard -->
+        <div class="protocol-box protocol-standard">
+            <span class="protocol-title">✅ Standard Protocol</span>
+            <p style="margin-top:0; font-size:0.9rem;"><em>Use if all checklist items are present.</em></p>
+            <ol class="step-list">
+                <li><strong>CREATE</strong> the event in the system immediately.</li>
+                <li><strong>CONTACT</strong> the FM for assignment.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- SECTION 3: PRIORITY SELECTOR -->
+    <h2>3. Determine Priority & SLAs</h2>
+    
+    <div class="matrix-container">
+        <div class="priority-card p-urgent" onclick="selectPriority('urgent')">
+            <span class="badge bg-urgent">URGENT</span>
+            <p><strong>Health & Safety Risk</strong></p>
+            <p style="font-size:0.85rem;">Immediate danger? Active flooding? Exposed wires?</p>
         </div>
 
-        <!-- P4 -->
-        <div class="priority-card p4">
-            <span class="p-badge bg-low">P4 - Scheduled</span>
-            <p style="margin:0; font-size:0.9rem;"><strong>Low Priority:</strong> Cosmetic issues, planned maintenance requests.</p>
-            <div class="sla-info">
-                <strong>Response:</strong> 5 Days<br>
-                <strong>Rectification:</strong> 20 Days
+        <div class="priority-card p-priority" onclick="selectPriority('priority')">
+            <span class="badge bg-priority">PRIORITY</span>
+            <p><strong>Disruption to Teaching</strong></p>
+            <p style="font-size:0.85rem;">Class cancelled? Main entrance blocked? Core services down?</p>
+        </div>
+
+        <div class="priority-card p-normal" onclick="selectPriority('normal')">
+            <span class="badge bg-normal">NORMAL</span>
+            <p><strong>Inconvenience</strong></p>
+            <p style="font-size:0.85rem;">Cosmetic damage? Scuff marks? Dripping tap?</p>
+        </div>
+    </div>
+
+    <div id="sla-result">
+        <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.3); padding-bottom:5px; color:white;">
+            Target Response Times: <span id="selected-priority-name"></span>
+        </h3>
+        <div class="sla-grid">
+            <div class="sla-item">
+                <small>Temporary Rectification</small>
+                <strong id="time-temp">--</strong>
+            </div>
+            <div class="sla-item">
+                <small>Perm. Fix (Cleaning)</small>
+                <strong id="time-clean">--</strong>
+            </div>
+            <div class="sla-item" style="grid-column: span 2;">
+                <small>Perm. Fix (Maintenance)</small>
+                <strong id="time-maint">--</strong>
             </div>
         </div>
     </div>
 
-    <!-- 3. WORKFLOW CHECKLISTS -->
+    <!-- 4. WORKFLOW CHECKLISTS -->
     <h2>3. Workflow Checklists</h2>
     <div id="validation-warning">⚠️ <strong>STOP:</strong> You must complete the checklist items below before generating the description.</div>
 
