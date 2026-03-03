@@ -500,7 +500,10 @@
             </tr>
             <tr class="workflow-check-row">
                 <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
-                <td><strong>Update Contractor</strong> (SO/FM/Subcontractor)</td>
+                <td>
+                    <strong>Update Contractor</strong> (SO/FM/Subcontractor)
+                    <input type="text" class="form-control" style="margin-top: 5px; font-size: 0.9rem;" placeholder="Enter Contractor Name...">
+                </td>
             </tr>
             <tr class="workflow-check-row">
                 <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
@@ -526,7 +529,10 @@
             </tr>
             <tr class="workflow-check-row">
                 <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
-                <td><strong>Update Contractor</strong> (SO/FM/Subcontractor)</td>
+                <td>
+                    <strong>Update Contractor</strong> (SO/FM/Subcontractor)
+                    <input type="text" class="form-control" style="margin-top: 5px; font-size: 0.9rem;" placeholder="Enter Contractor Name...">
+                </td>
             </tr>
             <tr class="workflow-check-row">
                 <td align="center"><input type="checkbox" class="wf-chk" onchange="toggleRow(this)"></td>
@@ -690,6 +696,11 @@
         document.getElementById('final-output').innerText = '';
         document.getElementById('validation-warning').style.display = 'none';
         
+        // Clear contractor inputs
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+             if(input.placeholder.includes("Contractor")) input.value = '';
+        });
+
         // Reset Type
         document.getElementById('gen-type').selectedIndex = 0;
 
